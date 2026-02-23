@@ -1,0 +1,32 @@
+name: Documentation Sync
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for base branch comparison
+
+      - uses: elmersson/company-docs/.github/actions/docs-sync@main
+        with:
+          service-name: loan-api
+          repo-type: backend
+          framework: express
+
+          # Customize these patterns to match your project structure:
+          entry-points: '["src/routes/**/*.ts"]'
+          dto-patterns: '["src/dto/**/*.ts", "src/models/**/*.ts"]'
+          event-patterns: '["src/events/**/*.ts"]'
+
+          # Prisma schema
+          prisma-schema-path: "prisma/schema.prisma"
+
+          # Secrets
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          docs-repo-token: ${{ secrets.DOCS_REPO_TOKEN }}
